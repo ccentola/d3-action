@@ -18,6 +18,58 @@
         });
 
         function dataViz(incomingData) {
+            incomingData.forEach(d => {
+                
+                // calculate impact
+                d.impact = d.favorites.length + d.retweets.length;
+                
+                // convert timestamp to date
+                d.tweetTime = new Date(d.timestamp);
+            })
+            
+            //
+            var maxImpact = d3.max(incomingData, d => d.impact);
+
+            // returns the earliest and latest times for the scale
+            var startEnd = d3.extent(incomingData, d => d.tweetTime);
+
+            //
+            var timeRamp = d3.scaleTime()
+                .domain(startEnd)
+                .range([20,480]);
+
+            //
+            var yScale = d3.scaleLinear()
+                .domain([0,maxImpact])
+                .range([0,460]);
+
+            //
+            var radiusScale = d3.scaleLinear()
+                .domain([0,maxImpact])
+                .range([1,20]);
+
+            // maps impact to a ramp from white to dark red
+            var colorScale = d3.scaleLinear()
+                .domain([0, maxImpact])
+                .range([['white','#75739F']]);
+
+            //
+            d3.select('svg')
+                .selectAll('circle')
+                .data(incomingData)
+                .enter()
+                .append('circle')
+                .attr('r', d => radiusScale(d.impact))
+                .attr('cx', d => timeRamp(d.tweetTime))
+                .attr('cy', d => 480 - yScale(d.impact))
+                //.style('fill', d => colorScale(d.impact))
+                .style('fill', 'blue')
+                .style('stroke', 'black')
+                .style('stroke-width', '1px');
+        };
+
+        /*
+        function dataViz(incomingData) {
             var nestedTweets = d3.nest()
                 .key(d => d.user)
                 .entries(incomingData);
@@ -45,7 +97,7 @@
                 .style('stroke', '#9a8b7a')
                 .style('stroke-width', '1px');
         }
-
+        */
         
             
 
