@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+    <head>
+        <!-- D3 v4 -->
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+        <style>
+            path.domain {
+                stroke: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="viz">
+            <svg style="width:600px;height:600px;"></svg>
+        </div>
+
+        <script>
+            d3.csv('../data/tweet_data.csv', lineChart);
+
+            function lineChart(data) {
+
+                var xScale = d3.scaleLinear().domain([1,10.5]).range([20,480]);
+                var yScale = d3.scaleLinear().domain([0,35]).range([480,20]);
+
+                var xAxis = d3.axisBottom()
+                    .scale(xScale)
+                    .tickSize(480)
+                    .tickValues([1,2,3,4,5,6,7,8,9,10]);
+
+                d3.select('svg').append('g').attr('id', 'xAxisG').call(xAxis);
+
+                var yAxis = d3.axisRight()
+                    .scale(yScale)
+                    .ticks(10)
+                    .tickSize(480);
+
+                d3.select('svg').append('g').attr('id', 'yAxisG').call(yAxis);
+
+                d3.select("svg").selectAll("circle.retweets")
+                .data(data)
+                .enter()
+                .append("circle")
+                    .attr("class", "retweets")
+                    .attr("r", 5)
+                    .attr("cx", d => xScale(d.day))
+                    .attr("cy", d => yScale(d.retweets))
+                    .style("fill", "#5eaec5");
+        
+                d3.select("svg").selectAll("circle.favorites")
+                .data(data)
+                .enter()
+                .append("circle")
+                    .attr("class", "favorites")
+                    .attr("r", 5)
+                    .attr("cx", d => xScale(d.day))
+                    .attr("cy", d => yScale(d.favorites))
+                    .style("fill", "#92c463");
+
+            }
+
+        </script>
+    </body>
+</html>
